@@ -1,0 +1,20 @@
+notas para configurar zipkin en un nuestros microservicios :
+-agregar la dependencia de zipkin client en cada microservicio que queramos hacer un trace con zipkin
+
+-ir a zipkin.io y bajar la ultima version del jar
+
+-crear un archivo de comandos (bat o cmd) y ingresar las variables requeridas para configurar nuestro proyecto zipkin, ejemplo:
+RABBIT_ADDRESSES, MYSQL_DB, MYSQL_USER, etc
+java -jar zipkin-server-2.19.3-exec.jar // con este comando levantamos nuestro proyecto zipkin del tipo archivo java
+
+-variables para configurar una bd en mysql:
+set STORAGE_TYPE= tipo de almacenamiento
+set MYSQL_DB=nombre de bd
+set MYSQL_USER=nombre del usuario con permiso para acceder a esa bd
+set MYSQL_PASS= password del usuario con permiso para acceder a esa bd
+set MYSQL_HOST= pasarle el host de mysql
+
+-al ya tener configurado zipkin y tener el servicio en marcha vamos a cada microservicio y en un archivo de configuracion tipo properties o yaml,
+agregamos dos variables:
+la primera es spring.sleuth.sampler.probability=1.0 //esta sirve para decirle al servicio que todas las solicitudes que haga sean recibidas por zipkin
+y la segunda spring.zipkin.base-url= host // aqui le damos el host donde se encuentra levantado zipkin

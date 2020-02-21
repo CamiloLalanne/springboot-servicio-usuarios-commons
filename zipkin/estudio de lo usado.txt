@@ -1,0 +1,14 @@
+-Eureka server is an application that hold the information about all client-service applications.
+every micro service will register into the eureka server and eureka server knows all client applications running
+on each port and ip address.
+eureka server is also known as discovery server.
+
+-Configuration cloud server is an application configuration file centralizer.
+
+-Ribbon is a client-side load balancer that gives you a lot of control over the behavior of HTTP and TCP clients.
+
+-Zuul Server is a gateway application that handles all the requests and does the dynamic routing of microservice applications. The Zuul Server is also known as Edge Server. Also internally, Zuul uses Netflix Ribbon to look up for all instances of the service from the service discovery (Eureka Server).
+
+-Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in service architectures. Features include both the collection and lookup of this data. It also includes the sleuth tool, which is responsible for generating trace id and span id for tracking requests.
+
+-Spring Security is a framework that focuses on providing both authentication and authorization to Java applications.
