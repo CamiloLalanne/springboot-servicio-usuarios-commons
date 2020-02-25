@@ -12,3 +12,46 @@ eureka server is also known as discovery server.
 -Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in service architectures. Features include both the collection and lookup of this data. It also includes the sleuth tool, which is responsible for generating trace id and span id for tracking requests.
 
 -Spring Security is a framework that focuses on providing both authentication and authorization to Java applications.
+
+-Swagger 2 project is used to describe and document RestFul Apis.
+
+-Docker is an open source project that allows us to optimize the implementation through containers. With a container, an application can be run with any operating system, since it only uses the system kernel. therefore share resources with the operating system
+
+docker run -p 8005:8005 --name servicio-item --network springcloud servicio-item-image:v1
+
+
+
+
+---DOCKER---
+-cuando ya tengamos creado nuestro dockerFile, vamos a la consola de comandos y nos ubicamos en el directorio donde tenemos el archivo y enviamos el siguiente comando para crear nuestra imagen: docker build -t config-server-image:v1 .
+1. en config-server-image es el nombre que le hemos dado dentro del dockerfile y el :v1 es solo para darle una version a la imagen.
+
+- ahora necesitamos crear una red para que todos nuestros microservicios se puedan comunicar (se necesita que todos esten ahi) con el comando:
+docker network create springcloud
+1. springcloud es el nombre que le asignaremos a la red (puede ser cualquiera)
+
+--para puertos dinamicos se usa de la distinta manera
+-creamos el contenedor con el siguiente comando: docker run -P --name servicio-producto --network springcloud servicio-producto-image:v1
+-creamos el contenedor con el siguiente comando: docker run -p 8761:8761 --name eureka-server --network springcloud eureka-server-image:v1
+1. el puerto antes de los : es el puerto local, ese puede ser cualquiera, pero el otro es el puerto de la aplicacion y tiene que ser el mismo que se le asigno en el archivo properties.
+2. --name config-server = nombre del contenedor.
+3. --network springcloud = nombre de la red que habiamos creado anteriormente.
+4. config-server-image:v1 nombre de la imagen que le dimos al crearla (incluye la version que le dimos)
+
+con CTR+C salimos del log luego de levantar un docker container
+ver contenedores con su imagen y estado : docker container -ls
+
+docker rmi idimage --force = comando para borrar una imagen
+docker rm idcontainer = comando para borrar un contenedor
+
+docker logs -f eureka-server = comando para ver logs
+
+docker run -p 3307:3306 --name mysql --network springcloud -e MYSQL_ROOT_PASSWORD=sasa -e MYSQL_DATABASE=producto_service_dev -d mysql:8
+docker run -p 5431:5432 --name postgres --network springcloud -e POSTGRES_PASSWORD=sasa -e POSTGRES_USER=postgres -e POSTGRES_DB=producto_service_dev -d postgres:12-alpine
+
+docker ps -a = lista todo los contenedores
+docker container ls -a = lista todos los contenedores
+
+
+para utilizar docker-compose se necesita crear un archivo con todos los servicios que levantar, todo esto utilizando el archivo docker-compose.yml.
+cuando ya tengamos configurado nuestros servicios, aplicamos el comando docker-compose up -d postgres // con esto levantamos los servicios de a uno.
