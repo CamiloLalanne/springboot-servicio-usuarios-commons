@@ -11,9 +11,12 @@ eureka server is also known as discovery server.
 
 -Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in service architectures. Features include both the collection and lookup of this data. It also includes the sleuth tool, which is responsible for generating trace id and span id for tracking requests.
 
+-Rest Template is used to create applications that consume RESTful web services. is a class that provides spring for consumer rest services.
+
+
 -Spring Security is a framework that focuses on providing both authentication and authorization to Java applications.
 
--Swagger 2 project is used to describe and document RestFul Apis.
+-Swagger 2 project is used to describe and document RestFul Apis. 
 
 -Docker is an open source project that allows us to optimize the implementation through containers. With a container, an application can be run with any operating system, since it only uses the system kernel. therefore share resources with the operating system
 
@@ -54,4 +57,69 @@ docker container ls -a = lista todos los contenedores
 
 
 para utilizar docker-compose se necesita crear un archivo con todos los servicios que levantar, todo esto utilizando el archivo docker-compose.yml.
-cuando ya tengamos configurado nuestros servicios, aplicamos el comando docker-compose up -d postgres // con esto levantamos los servicios de a uno.
+cuando ya tengamos configurado nuestros servicios, aplicamos el comando docker-compose up -d "service name" // con esto levantamos los servicios de a uno.
+
+
+//CONFIGURAR CONFIG CLOUD
+agregar dependencia spring-cloud-config-server en nuestra clase principal.
+habilitar con la anotacion @EnableConfigServer
+ir al application.properties y darle un nombre de apk, port y darle la ruta del repositorio git donde se centraliza la configuracion de archivos.
+spring.cloud.config.server.git.uri=https://github.com/CamiloLalanne/config-files.git
+
+//CONSUMIR CONFIG CLOUD
+agregar dependencia de config client.
+ir al application.properties y agregar la ruta del config server.
+spring.cloud.config.uri=http://localhost:8888
+
+//CONFIGURAR EUREKA SERVER
+agregar dependencia eureka server
+habilitar con la anotacion @EnableEurekaServer en nuestra clase principal.
+ir al application.properties y darle un nombre de apk y port.
+ademas puedes deshabilitar si quieres que el servicio se registre en eureka.
+
+//CONSUMIR EUREKA
+agregar dependencia eureka client.
+agregar anotacion @EnableEurekaClient en nuestra clase principal.
+agregar url de eureka server.
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+
+
+//DOCKERIZAR UNA APLICACION
+crear un archivo Dockerfile
+agregar el jdk que usaremos con FROM openjdk:8
+agregar la ubicacion del jar con ADD ./target/servicio.jar servicio-image.jar
+el servicio-image.jar es el nombre que le damos a la imagen, este puede ser cualquiera.
+ahora agregamos un comando para ejecutar el jar: ENTRYPOINT ["java","-jar","/servicio-item-image.jar"]
+luego para crear una imagen del servicio vamos a una termila y ejecutamos: docker build -t servicio-item-image:v1 .
+
+ahora para poder levantar nuestro servicio vamos a nuestro docker file y agregamos la siguiente configuracion
+
+services:
+  config-server:
+    image: config-server-image:v1
+    ports:
+      - "8888:8888"
+      - "7777:7777"
+    restart: always
+    networks:
+      - springcloud
+donde services: es donde iran registrados todos nuestros microservicios.
+config-server: es el nombre que le asignaremos al contenedor de nuestro servicio.
+image: es el nombre de imagen que le dimos en el Dockerfile.
+port: es el numero de puerto que le asignaremos, con este puerto se levantara una instancia, puede ser una instancia o varias.
+restart: es para que cada vez que se pueda caer el servicio, este se intente levantar siempre.
+networks: con este nombre es como nuestras aplicaciones se puede comunicar, todas tienen que estar en la misma red.
+
+//CONFIGURAR ZUUL SERVER
+agregar dependencia zuul server.
+habilitar con la anotacion @EnableZuulProxy en nuestra clase principal.
+luego ir a application.properties y agregar nombre de apk, puerto y luego agregar los servicios por su application id, ademas de agregar una ruta a tu comodidad.
+zuul.routes.items.service-id=SERVICIO-ITEMS
+zuul.routes.items.path=/api/items/**
+
+//FEIGNCLIENT
+agregar dependencia de feign client.
+habilitar feign con @EnableFeignClients.
+agregar una interfaz y agregar la anotacion @FeignClient(name="serviceID eureka")
+para llamar los endpoint del servicio que estamos consumiendo necesitamos agregar los endpoint en metodos, ejemplo:
+@GetMapping("/serviceError")
